@@ -1,0 +1,31 @@
+---
+title: "String Practice"
+output: html_document
+date: "2023-08-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+alarm_report <- data.frame(
+  stringsAsFactors = FALSE,
+              date = c("2020-03-14", "2020-03-15", "2020-04-10", "2020-04-18"),
+          building = c("Engineering-North",
+                       "Bren Hall","Engineering-South","Engr-North"),
+     alarm_message = c("10:02am – HVAC system down, facilities management alerted",
+                       "8:24am – Elevator North out of service",
+                       "12:41am – Fire alarm, UCSB fire responded and cleared",
+                       "9:58pm – Campus point emergency siren, UCPD responded")
+)
+
+alarm_report_2 <- alarm_report %>% 
+  mutate(building = (str_replace(building, pattern = "Engr", replacement = "Engineering"))) %>% 
+  separate(building, c("Building","Wing")) %>% 
+  filter(str_detect(alarm_report$alarm_message , pattern = "responded")) %>% 
+  separate(alarm_message, c("time","alarm_message"), sep = " –") %>% 
+  mutate(date = lubridate::ymd(date))
+```
+
+

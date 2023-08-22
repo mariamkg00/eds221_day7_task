@@ -1,0 +1,71 @@
+---
+title: "Bird Joins"
+output: html_document
+date: "2023-08-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+```
+
+```{r}
+bird_observations <- read_csv(here::here("data","52_pp52_birds_1.csv"))
+
+sites <- read_csv(here::here("data","52_pp52_sites_1.csv"))
+
+surveys <- read_csv(here::here("data","52_pp52_surveys_1.csv"))
+
+taxalist <- read_csv(here::here("data","52_pp52_taxalist_1.csv"))
+```
+```{r}
+#making a subset of bird_observations
+
+birds_subset <- bird_observations %>% 
+  filter(species_id %in% c("BHCO","RWBL"),
+         site_id %in% c("LI-W","NU-C"))
+```
+```{r}
+bird_left <- left_join(birds_subset, sites , by = "site_id")
+
+bird_left2 <- left_join(birds_subset , taxalist, by = "species_id")
+```
+
+Full join practice:
+I expect full_join() to contain all information from both birds_subset and sites and combine it into one subset. 
+```{r}
+birds_full <- full_join(birds_subset , sites , by= "site_id")
+```
+
+Inner join practice:
+I expect an inner_join() between birds_subset and taxalist to contain values that ONLY the two share in common with the species id. 
+```{r}
+birds_inner <- inner_join(birds_subset, taxalist , by= "species_id")
+
+```
+
+## Task 2 : Data wrangling and visualization with birds 
+```{r}
+bird_observation_notes <- bird_observations %>% 
+  rename(birds_obs_notes = notes)
+```
+```{r}
+# a subset that contains all observations in the birds dataset, joins the taxonomic, site and survey information to it. 
+
+bird_full1 <- full_join(bird_observation_notes, taxalist, by = "species_id")
+bird_full2 <- full_join(bird_full1, sites, by = "site_id")
+bird_full3 <- full_join(bird_full2, surveys , by = "survey_id")
+
+bird_full4 <- bird_full3 %>% 
+  select(survey_date, common_name, park_name, bird_count) %>% 
+  mutate(survey_month = lubridate::month(survey_date)) %>% 
+  mutate(survey_month = as.factor(survey_month)) %>% 
+  relocate(survey_month, .after = survey_date ) %>% 
+  group_by(park_name,survey_month) %>% 
+  summarize(total_birds = n()) %>% 
+  filter(park_name %in% c("Lindo","Orme","Palomino","Sonrisa"))
+
+```
+Task 3 : practice with strings
+
