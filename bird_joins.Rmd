@@ -67,5 +67,5 @@ bird_full4 <- bird_full3 %>%
   filter(park_name %in% c("Lindo","Orme","Palomino","Sonrisa"))
 
 ```
-Task 3 : practice with strings
+
 
